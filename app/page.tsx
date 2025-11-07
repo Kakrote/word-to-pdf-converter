@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Download, FileText, Loader2, CheckCircle2, XCircle, Folder } from 'lucide-react';
+import { Upload, Download, FileText, Loader2, CheckCircle2, XCircle, Folder, AlertCircle } from 'lucide-react';
 
 interface FileStatus {
   name: string;
@@ -334,26 +334,65 @@ export default function Home() {
           </div>
 
           {/* Info Card */}
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-6 mb-4">
+            <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg border border-green-200 mb-4">
+              <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-semibold text-green-900 mb-1">
+                  Perfect Formatting with LibreOffice! ✨
+                </h4>
+                <p className="text-sm text-green-700">
+                  This tool uses LibreOffice conversion engine to preserve <strong>ALL formatting</strong> including 
+                  images, tables, colors, fonts, headers, footers, and complex layouts - exactly as they appear in Word!
+                </p>
+              </div>
+            </div>
+            
             <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              How it works
+              What's preserved
+            </h3>
+            <ul className="space-y-2 text-sm text-gray-600 mb-4">
+              <li className="flex items-start">
+                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2 mt-0.5 shrink-0" />
+                <span><strong>All images</strong> and graphics</span>
+              </li>
+              <li className="flex items-start">
+                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2 mt-0.5 shrink-0" />
+                <span><strong>Tables</strong> with borders, shading, and formatting</span>
+              </li>
+              <li className="flex items-start">
+                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2 mt-0.5 shrink-0" />
+                <span><strong>Colors, fonts, and text formatting</strong> (bold, italic, underline)</span>
+              </li>
+              <li className="flex items-start">
+                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2 mt-0.5 shrink-0" />
+                <span><strong>Headers, footers, and page numbers</strong></span>
+              </li>
+              <li className="flex items-start">
+                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2 mt-0.5 shrink-0" />
+                <span><strong>Page layouts and margins</strong></span>
+              </li>
+              <li className="flex items-start">
+                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2 mt-0.5 shrink-0" />
+                <span><strong>Special characters</strong> (Greek, math symbols, etc.)</span>
+              </li>
+            </ul>
+            
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+              How to use
             </h3>
             <ol className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start">
                 <span className="font-semibold text-indigo-600 mr-2">1.</span>
-                <span>Upload an entire folder or select multiple Word documents (.doc or .docx)</span>
+                <span>Upload Word documents (.doc or .docx) or entire folders</span>
               </li>
               <li className="flex items-start">
                 <span className="font-semibold text-indigo-600 mr-2">2.</span>
-                <span>All Word files will be automatically detected and listed</span>
+                <span>Click "Convert to PDF" - LibreOffice handles the conversion</span>
               </li>
               <li className="flex items-start">
                 <span className="font-semibold text-indigo-600 mr-2">3.</span>
-                <span>Click "Convert to PDF" to convert all files at once</span>
-              </li>
-              <li className="flex items-start">
-                <span className="font-semibold text-indigo-600 mr-2">4.</span>
-                <span>Download all converted PDFs as a single ZIP file</span>
+                <span>Download the ZIP file with perfectly formatted PDFs!</span>
               </li>
             </ol>
           </div>
