@@ -6,7 +6,7 @@ import JSZip from 'jszip';
 // Configure runtime for Vercel
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60; // Maximum execution time in seconds
+export const maxDuration = 300; // Maximum execution time in seconds (5 minutes)
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,7 +39,14 @@ export async function POST(request: NextRequest) {
         console.log(`Extracting text from ${file.name}...`);
         // Extract text from Word document
         const result = await mammoth.extractRawText({ buffer });
-        const text = result.value;
+        let text = result.value;
+
+        // Sanitize text - replace tabs and other special characters
+        text = text
+          .replace(/\t/g, '    ') // Replace tabs with 4 spaces
+          .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters
+          .replace(/\r\n/g, '\n') // Normalize line endings
+          .replace(/\r/g, '\n'); // Normalize line endings
 
         if (!text || text.trim().length === 0) {
           console.warn(`Warning: ${file.name} appears to be empty`);

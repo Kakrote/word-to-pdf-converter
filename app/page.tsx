@@ -11,9 +11,9 @@ interface FileStatus {
 }
 
 // Configuration
-const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB per file
-const MAX_TOTAL_SIZE = 4.5 * 1024 * 1024; // 4.5 MB total (Vercel limit)
-const MAX_FILES = 20; // Reasonable limit for conversion
+const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB per file
+const MAX_TOTAL_SIZE = 500 * 1024 * 1024; // 500 MB total
+const MAX_FILES = 100; // Maximum number of files
 
 export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
@@ -48,12 +48,12 @@ export default function Home() {
       }
       
       if (oversizedFiles.length > 0) {
-        alert(`The following files are too large (max 4 MB per file):\n${oversizedFiles.join('\n')}`);
+        alert(`The following files are too large (max 500 MB per file):\n${oversizedFiles.join('\n')}`);
         return;
       }
       
       if (totalSize > MAX_TOTAL_SIZE) {
-        alert(`Total file size (${(totalSize / 1024 / 1024).toFixed(2)} MB) exceeds limit of 4.5 MB. Please select fewer or smaller files.`);
+        alert(`Total file size (${(totalSize / 1024 / 1024).toFixed(2)} MB) exceeds limit of 500 MB. Please select fewer or smaller files.`);
         return;
       }
       
@@ -191,7 +191,7 @@ export default function Home() {
                     Select a folder or multiple Word documents (.doc, .docx)
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    Max 4 MB per file • 4.5 MB total • Up to 20 files
+                    Max 500 MB per file • 500 MB total • Up to 100 files
                   </p>
                 </div>
                 <input
