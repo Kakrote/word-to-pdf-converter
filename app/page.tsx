@@ -10,6 +10,11 @@ interface FileStatus {
   path?: string;
 }
 
+// Configuration
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB per file
+const MAX_TOTAL_SIZE = 4.5 * 1024 * 1024; // 4.5 MB total (Vercel limit)
+const MAX_FILES = 20; // Reasonable limit for conversion
+
 export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
   const [fileStatuses, setFileStatuses] = useState<FileStatus[]>([]);
@@ -24,6 +29,33 @@ export default function Home() {
         file => file.name.endsWith('.docx') || file.name.endsWith('.doc') || 
                file.name.endsWith('.DOCX') || file.name.endsWith('.DOC')
       );
+      
+      // Validate file count
+      if (wordFiles.length > MAX_FILES) {
+        alert(`Too many files! Please select maximum ${MAX_FILES} files at once.`);
+        return;
+      }
+      
+      // Validate individual file sizes and total size
+      let totalSize = 0;
+      const oversizedFiles: string[] = [];
+      
+      for (const file of wordFiles) {
+        if (file.size > MAX_FILE_SIZE) {
+          oversizedFiles.push(`${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+        }
+        totalSize += file.size;
+      }
+      
+      if (oversizedFiles.length > 0) {
+        alert(`The following files are too large (max 4 MB per file):\n${oversizedFiles.join('\n')}`);
+        return;
+      }
+      
+      if (totalSize > MAX_TOTAL_SIZE) {
+        alert(`Total file size (${(totalSize / 1024 / 1024).toFixed(2)} MB) exceeds limit of 4.5 MB. Please select fewer or smaller files.`);
+        return;
+      }
       
       // Extract folder name from file path
       if (wordFiles.length > 0 && wordFiles[0].webkitRelativePath) {
@@ -63,20 +95,42 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        throw new Error('Conversion failed');
+        const errorData = await response.json().catch(() => ({ error: 'Conversion failed' }));
+        throw new Error(errorData.details || errorData.error || 'Conversion failed');
       }
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       setDownloadUrl(url);
       
-      setFileStatuses(prev =>
-        prev.map(file => ({ ...file, status: 'success' }))
-      );
+      // Check for partial errors in headers
+      const errorHeader = response.headers.get('X-Conversion-Errors');
+      if (errorHeader) {
+        const errors = JSON.parse(errorHeader);
+        console.warn('Some files failed to convert:', errors);
+        
+        // Mark individual files as error/success
+        setFileStatuses(prev =>
+          prev.map(file => {
+            const hasError = errors.some((err: string) => err.startsWith(file.name));
+            return { 
+              ...file, 
+              status: hasError ? 'error' : 'success',
+              error: hasError ? 'Conversion failed' : undefined
+            };
+          })
+        );
+      } else {
+        setFileStatuses(prev =>
+          prev.map(file => ({ ...file, status: 'success' }))
+        );
+      }
     } catch (error) {
       console.error('Error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Conversion failed';
+      alert(`Conversion error: ${errorMessage}`);
       setFileStatuses(prev =>
-        prev.map(file => ({ ...file, status: 'error', error: 'Conversion failed' }))
+        prev.map(file => ({ ...file, status: 'error', error: errorMessage }))
       );
     } finally {
       setIsConverting(false);
@@ -135,6 +189,9 @@ export default function Home() {
                   </p>
                   <p className="text-xs text-gray-500">
                     Select a folder or multiple Word documents (.doc, .docx)
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Max 4 MB per file • 4.5 MB total • Up to 20 files
                   </p>
                 </div>
                 <input
